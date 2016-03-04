@@ -6,11 +6,124 @@
 def solve(board_string)
 end
 
+board_string = File.readlines('sudoku_puzzles.txt').first.chomp
 # Returns a boolean indicating whether
 # or not the provided board is solved.
 # The input board will be in whatever
 # form `solve` returns.
 def solved?(board)
+	simplify(board)
+	board.each do |row|
+		row.find do |cell|
+			if !cell.is_a?(Integer)
+				return false
+			end
+		end
+	end
+	return true
+end
+
+def make_board(board_string)
+  board_string.scan(/.{9}/).map! do |x|
+    x.split('').map do |y|
+       y == '-' ? ' ' : y.to_i
+    end
+  end
+
+end
+
+def recursion(board)
+	if complete?(board)
+		pretty_board(board)
+	else
+		simplify(board)
+	end
+end
+
+def horizontal_check(board)
+	board
+	board.each do |row|
+		check_arr = [1,2,3,4,5,6,7,8,9]
+		row.find_all do |cell| 
+			if cell.is_a?(Integer) 
+				check_arr.delete(cell)
+			end
+		end
+		row.map! do |cell|
+			if !cell.is_a?(Integer)
+				cell = check_arr
+			else
+				cell = cell
+			end
+		end
+	end
+	return board
+end
+
+def vertical_check(board)
+  horizontal_check(board)
+  transposed_board = board.transpose
+  transposed_board.each do |column|
+    removal_arr = column.select { |cell| cell.is_a?(Integer) }
+    column.map! do |cell|
+      if cell.is_a?(Array)
+        cell = cell - removal_arr
+      else
+        cell = cell
+      end
+    end
+  end
+  board = transposed_board.transpose
+  return board
+
+end
+
+def box_check(board)
+  row_column_coordinates = {
+    "top_left" => [[0,1,2],[0,1,2]],
+    "top_middle" => [[3,4,5],[0,1,2]],
+    "top_right" => [[6,7,8],[0,1,2]],
+    "middle_left" => [[0,1,2],[3,4,5]],
+    "middle" => [[3,4,5],[3,4,5]],
+    "middle_right" => [[6,7,8],[3,4,5]],
+    "bottom_left" => [[0,1,2],[6,7,8]],
+    "bottom_middle" => [[3,4,5],[6,7,8]],
+    "bottom_right" => [[6,7,8],[6,7,8]],
+  }
+
+  existing_nums_per_box = {
+    "top_left" => [],
+    "top_middle" => [],
+    "top_right" => [],
+    "middle_left" => [],
+    "middle" => [],
+    "middle_right" => [],
+    "bottom_left" => [],
+    "bottom_middle" => [],
+    "bottom_right" => [],
+  }
+
+  row_column_coordinates.each do |name, coordinates|
+    coordinates[0].each do |row_num|
+        coordinates[1].each do |col_num|
+          if board[row_num][col_num].is_a?(Integer)
+            existing_nums_per_box[name] << board[row_num][col_num]
+          end
+        end
+    end
+  end
+
+  row_column_coordinates.each do |name, coordinates|
+    coordinates[0].each do |row_num|
+        coordinates[1].each do |col_num|
+          if board[row_num][col_num].is_a?(Array)
+            board[row_num][col_num] - existing_nums_per_box[name]
+          end
+        end
+    end
+  end
+
+  board
 end
 
 # Takes in a board in some form and
@@ -19,4 +132,24 @@ end
 # The input board will be in whatever
 # form `solve` returns.
 def pretty_board(board)
+	  board.each {|row| p row}
 end
+
+
+def simplify(board)
+	vertical_check(board)
+	board.each do |row|
+		row.map! do |cell|
+			if cell.is_a?(Array) && cell.length == 1
+				cell = cell[0]
+			elsif cell.is_a?(Array) && cell.length > 1
+				cell = ' '
+			else cell = cell
+			end
+		end
+	end
+	return board
+end	
+
+
+
