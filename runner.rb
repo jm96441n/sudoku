@@ -1,3 +1,5 @@
+require 'pry'
+
 require_relative 'sudoku'
 
 # The sudoku puzzles that your program will solve can be found
