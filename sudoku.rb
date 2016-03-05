@@ -26,6 +26,7 @@ end
 
 def simplify(board)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
+  # pretty_board(board)
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
@@ -150,39 +151,46 @@ end
 
 
 def unique_possibilities_check(board)
-  board.each do |row|
+  uniques = {
+    0 => nil,
+    1 => nil,
+    2 => nil,
+    3 => nil,
+    4 => nil,
+    5 => nil,
+    6 => nil,
+    7 => nil,
+    8 => nil
+  }
+  board.each_with_index do |row, index|
     arrays = []
     num_times = Hash.new
-    unique_num = nil
 
-    binding.pry
-
-    row.each do |cell|
-      arrays = row.select{|cell| cell.is_a?(Array)}.flatten!
+    arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
+    # binding.pry
+    if arrays != nil
       arrays.each do |number|
-        binding.pry
         if num_times.keys.include?(number)
           num_times[number] += 1
         else
           num_times[number] = 1
         end
       end
-      unique_num = num_times.select {|key,value| value == 1}.keys[0]
-
-    row.map! do |element|
-      if element.is_a?(Array) && element.include?(unique_num)
-        element = unique_num
-      else
-        element
-      end
-    end
-
+      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
     end
   end
 
-binding.pry
+  board.each_with_index do |row, index|
+    row.map! do |cell|
+      if cell.is_a?(Array) && cell.include?(uniques[index])
+        cell = uniques[index]
+      else
+        cell
+      end
+    end
+  end
 
-  board
+board
 
 end
 
