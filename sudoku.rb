@@ -1,18 +1,19 @@
 require 'pry'
-def solve(board_string)
+
+def solve(board_string, not_simplified=0)
+
   if board_string.is_a?(String)
     board = make_board(board_string)
   else
     board = board_string
   end
-# Takes a board as a string in the format
-# you see in the puzzle file. Returns
-# something representing a board after
-# your solver has tried to solve it.
-  if solved?(board)
+
+  pretty_board(board)
+
+  if solved?(board) || not_simplified == 3
     pretty_board(board)
   else
-    simplify(board)
+    simplify(board, not_simplified)
   end
 end
 
@@ -24,12 +25,16 @@ def make_board(board_string)
   end
 end
 
-def simplify(board)
+def simplify(board, not_simplified=0)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
-  # pretty_board(board)
+  binding.pry
+
+  num_simplified = 0
+
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
+        num_simplified += 1
         cell = cell[0]
       elsif cell.is_a?(Array) && cell.length > 1
         cell = ' '
@@ -37,13 +42,14 @@ def simplify(board)
       end
     end
   end
-  solve(board)
+
+  if num_simplified == 0
+    not_simplified += 1
+  end
+
+  solve(board, not_simplified)
 end
 
-# Returns a boolean indicating whether
-# or not the provided board is solved.
-# The input board will be in whatever
-# form `solve` returns.
 def solved?(board)
 	board.each do |row|
 		row.each do |cell|
@@ -71,7 +77,7 @@ def horizontal_check(board)
 			end
 		end
 	end
-	return board
+	board
 end
 
 def vertical_check(board)
@@ -87,7 +93,7 @@ def vertical_check(board)
     end
   end
   board = transposed_board.transpose
-  return board
+  board
 
 end
 
@@ -139,15 +145,10 @@ def box_check(board)
   board
 end
 
-# Takes in a board in some form and
-# returns a _String_ that's well formatted
-# for output to the screen. No `puts` here!
-# The input board will be in whatever
-# form `solve` returns.
+
 def pretty_board(board)
 	  board.each {|row| p row}
 end
-
 
 
 def unique_possibilities_check(board)
@@ -167,7 +168,6 @@ def unique_possibilities_check(board)
     num_times = Hash.new
 
     arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
-    # binding.pry
     if arrays != nil
       arrays.each do |number|
         if num_times.keys.include?(number)
@@ -193,22 +193,3 @@ def unique_possibilities_check(board)
 board
 
 end
-
-
-# CREATE hash with one key for each row (by index)
-# ITERATE through board (rows)
-#  ITERATE through rows (cells)
-#   add possible numbers to value in hash for that row (access by index)
-#   ITERATE through hash
-#    REFINE all possibilities into one unique number if possible.
-#    num_times.select {|key,value| value == 1}.keys[0]
-# END
-# ITERATAE through board (rows)
-#  ITERATE through rows(cell)
-#    IF cell is an array and the array includes the value of the row's key in the hash of unique values
-#      REPLACE with unique value from hash
-#    ELSE
-#      keep same element
-#   END
-
-
