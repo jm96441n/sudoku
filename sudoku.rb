@@ -1,7 +1,6 @@
 require 'pry'
 
 def solve(board_string, not_simplified=0)
-
   if board_string.is_a?(String)
     board = make_board(board_string)
   else
@@ -10,11 +9,12 @@ def solve(board_string, not_simplified=0)
 
   pretty_board(board)
 
-  if solved?(board) || not_simplified == 3
+  if solved?(board) || not_simplified == 500
     pretty_board(board)
   else
     simplify(board, not_simplified)
   end
+  # binding.pry
 end
 
 def make_board(board_string)
@@ -27,10 +27,8 @@ end
 
 def simplify(board, not_simplified=0)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
-  binding.pry
-
   num_simplified = 0
-
+  #binding.pry
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
@@ -46,7 +44,7 @@ def simplify(board, not_simplified=0)
   if num_simplified == 0
     not_simplified += 1
   end
-
+# binding.pry
   solve(board, not_simplified)
 end
 
@@ -77,6 +75,7 @@ def horizontal_check(board)
 			end
 		end
 	end
+# binding.pry
 	board
 end
 
@@ -93,6 +92,7 @@ def vertical_check(board)
     end
   end
   board = transposed_board.transpose
+  # binding.pry
   board
 
 end
@@ -100,13 +100,13 @@ end
 def box_check(board)
   row_column_coordinates = {
     "top_left" => [[0,1,2],[0,1,2]],
-    "top_middle" => [[3,4,5],[0,1,2]],
-    "top_right" => [[6,7,8],[0,1,2]],
-    "middle_left" => [[0,1,2],[3,4,5]],
+    "top_middle" => [[0,1,2],[3,4,5]],
+    "top_right" => [[0,1,2],[6,7,8]],
+    "middle_left" => [[3,4,5],[0,1,2]],
     "middle" => [[3,4,5],[3,4,5]],
-    "middle_right" => [[6,7,8],[3,4,5]],
-    "bottom_left" => [[0,1,2],[6,7,8]],
-    "bottom_middle" => [[3,4,5],[6,7,8]],
+    "middle_right" => [[3,4,5],[6,7,8]],
+    "bottom_left" => [[6,7,8],[0,1,2]],
+    "bottom_middle" => [[6,7,8],[3,4,5]],
     "bottom_right" => [[6,7,8],[6,7,8]],
   }
 
@@ -135,13 +135,14 @@ def box_check(board)
   row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
+          # binding.pry
           if board[row_num][col_num].is_a?(Array)
-            board[row_num][col_num] - existing_nums_per_box[name]
+            board[row_num][col_num] -= existing_nums_per_box[name]
           end
         end
     end
   end
-
+# binding.pry
   board
 end
 
@@ -189,7 +190,50 @@ def unique_possibilities_check(board)
       end
     end
   end
+    board.transpose.each_with_index do |row, index|
+    arrays = []
+    num_times = Hash.new
 
+    arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
+    if arrays != nil
+      arrays.each do |number|
+        if num_times.keys.include?(number)
+          num_times[number] += 1
+        else
+          num_times[number] = 1
+        end
+      end
+      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
+    end
+  end
+
+  board.transpose.each_with_index do |row, index|
+    row.map! do |cell|
+      if cell.is_a?(Array) && cell.include?(uniques[index])
+        cell = uniques[index]
+      else
+        cell
+      end
+    end
+  end
+# binding.pry
 board
 
 end
+
+
+#box unique check
+# hash coordinates
+#  access each coordinate in box
+#   if array push into array, flatten and find unique num
+# access each coordinate
+#   if array includes unique number replace array for unique num
+
+# next logic
+# after 81 tries (tracked through passed variable)
+# call test method
+#  save current board as a variable
+#  try each possibility in each box with an array
+#  if 81 tries do not produce solution, move to next box or next possibility in box
+#  if box solved? return board to original method solve?
+
