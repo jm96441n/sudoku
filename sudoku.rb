@@ -220,3 +220,20 @@ def unique_possibilities_check(board)
 board
 
 end
+
+
+#box unique check
+# hash coordinates
+#  access each coordinate in box
+#   if array push into array, flatten and find unique num
+# access each coordinate
+#   if array includes unique number replace array for unique num
+
+# next logic
+# after 81 tries (tracked through passed variable)
+# call test method
+#  save current board as a variable
+#  try each possibility in each box with an array
+#  if 81 tries do not produce solution, move to next box or next possibility in box
+#  if box solved? return board to original method solve?
+
