@@ -9,7 +9,7 @@ def solve(board_string, not_simplified=0)
 
   pretty_board(board)
 
-  if solved?(board) || not_simplified == 50
+  if solved?(board) || not_simplified == 500
     pretty_board(board)
   else
     simplify(board, not_simplified)
@@ -28,7 +28,7 @@ end
 def simplify(board, not_simplified=0)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
   num_simplified = 0
-
+  #binding.pry
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
@@ -135,8 +135,9 @@ def box_check(board)
   row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
+          # binding.pry
           if board[row_num][col_num].is_a?(Array)
-            board[row_num][col_num] - existing_nums_per_box[name]
+            board[row_num][col_num] -= existing_nums_per_box[name]
           end
         end
     end
@@ -181,6 +182,32 @@ def unique_possibilities_check(board)
   end
 
   board.each_with_index do |row, index|
+    row.map! do |cell|
+      if cell.is_a?(Array) && cell.include?(uniques[index])
+        cell = uniques[index]
+      else
+        cell
+      end
+    end
+  end
+    board.transpose.each_with_index do |row, index|
+    arrays = []
+    num_times = Hash.new
+
+    arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
+    if arrays != nil
+      arrays.each do |number|
+        if num_times.keys.include?(number)
+          num_times[number] += 1
+        else
+          num_times[number] = 1
+        end
+      end
+      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
+    end
+  end
+
+  board.transpose.each_with_index do |row, index|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.include?(uniques[index])
         cell = uniques[index]
