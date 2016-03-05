@@ -1,7 +1,6 @@
 require 'pry'
 
 def solve(board_string, not_simplified=0)
-
   if board_string.is_a?(String)
     board = make_board(board_string)
   else
@@ -10,11 +9,12 @@ def solve(board_string, not_simplified=0)
 
   pretty_board(board)
 
-  if solved?(board) || not_simplified == 3
+  if solved?(board) || not_simplified == 50
     pretty_board(board)
   else
     simplify(board, not_simplified)
   end
+  # binding.pry
 end
 
 def make_board(board_string)
@@ -27,8 +27,6 @@ end
 
 def simplify(board, not_simplified=0)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
-  binding.pry
-
   num_simplified = 0
 
   board.each do |row|
@@ -46,7 +44,7 @@ def simplify(board, not_simplified=0)
   if num_simplified == 0
     not_simplified += 1
   end
-
+# binding.pry
   solve(board, not_simplified)
 end
 
@@ -77,6 +75,7 @@ def horizontal_check(board)
 			end
 		end
 	end
+# binding.pry
 	board
 end
 
@@ -93,6 +92,7 @@ def vertical_check(board)
     end
   end
   board = transposed_board.transpose
+  # binding.pry
   board
 
 end
@@ -100,13 +100,13 @@ end
 def box_check(board)
   row_column_coordinates = {
     "top_left" => [[0,1,2],[0,1,2]],
-    "top_middle" => [[3,4,5],[0,1,2]],
-    "top_right" => [[6,7,8],[0,1,2]],
-    "middle_left" => [[0,1,2],[3,4,5]],
+    "top_middle" => [[0,1,2],[3,4,5]],
+    "top_right" => [[0,1,2],[6,7,8]],
+    "middle_left" => [[3,4,5],[0,1,2]],
     "middle" => [[3,4,5],[3,4,5]],
-    "middle_right" => [[6,7,8],[3,4,5]],
-    "bottom_left" => [[0,1,2],[6,7,8]],
-    "bottom_middle" => [[3,4,5],[6,7,8]],
+    "middle_right" => [[3,4,5],[6,7,8]],
+    "bottom_left" => [[6,7,8],[0,1,2]],
+    "bottom_middle" => [[6,7,8],[3,4,5]],
     "bottom_right" => [[6,7,8],[6,7,8]],
   }
 
@@ -141,7 +141,7 @@ def box_check(board)
         end
     end
   end
-
+# binding.pry
   board
 end
 
@@ -189,7 +189,7 @@ def unique_possibilities_check(board)
       end
     end
   end
-
+# binding.pry
 board
 
 end
