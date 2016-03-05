@@ -26,6 +26,7 @@ end
 
 def simplify(board)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
+  # pretty_board(board)
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
@@ -150,32 +151,64 @@ end
 
 
 def unique_possibilities_check(board)
-  board.each do |row|
-  binding.pry
-    arrays = row.select{|cell| cell.is_a?(Array)}.flatten!
+  uniques = {
+    0 => nil,
+    1 => nil,
+    2 => nil,
+    3 => nil,
+    4 => nil,
+    5 => nil,
+    6 => nil,
+    7 => nil,
+    8 => nil
+  }
+  board.each_with_index do |row, index|
+    arrays = []
     num_times = Hash.new
 
-    arrays.each do |number|
-      if num_times.keys.include?(number)
-        num_times[number] += 1
-      else
-        num_times[number] = 1
+    arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
+    # binding.pry
+    if arrays != nil
+      arrays.each do |number|
+        if num_times.keys.include?(number)
+          num_times[number] += 1
+        else
+          num_times[number] = 1
+        end
       end
+      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
     end
+  end
 
-    unique_num = num_times.select {|key,value| value == 1}.keys
-
-    row.map! do |element|
-      if element.is_a?(Array) && element.include?(unique_num)
-        element = unique_num
+  board.each_with_index do |row, index|
+    row.map! do |cell|
+      if cell.is_a?(Array) && cell.include?(uniques[index])
+        cell = uniques[index]
+      else
+        cell
       end
     end
   end
 
-  board
+board
 
 end
 
 
+# CREATE hash with one key for each row (by index)
+# ITERATE through board (rows)
+#  ITERATE through rows (cells)
+#   add possible numbers to value in hash for that row (access by index)
+#   ITERATE through hash
+#    REFINE all possibilities into one unique number if possible.
+#    num_times.select {|key,value| value == 1}.keys[0]
+# END
+# ITERATAE through board (rows)
+#  ITERATE through rows(cell)
+#    IF cell is an array and the array includes the value of the row's key in the hash of unique values
+#      REPLACE with unique value from hash
+#    ELSE
+#      keep same element
+#   END
 
 
