@@ -151,31 +151,56 @@ end
 
 def unique_possibilities_check(board)
   board.each do |row|
-  binding.pry
-    arrays = row.select{|cell| cell.is_a?(Array)}.flatten!
+    arrays = []
     num_times = Hash.new
+    unique_num = nil
 
-    arrays.each do |number|
-      if num_times.keys.include?(number)
-        num_times[number] += 1
-      else
-        num_times[number] = 1
+    binding.pry
+
+    row.each do |cell|
+      arrays = row.select{|cell| cell.is_a?(Array)}.flatten!
+      arrays.each do |number|
+        binding.pry
+        if num_times.keys.include?(number)
+          num_times[number] += 1
+        else
+          num_times[number] = 1
+        end
       end
-    end
-
-    unique_num = num_times.select {|key,value| value == 1}.keys
+      unique_num = num_times.select {|key,value| value == 1}.keys[0]
 
     row.map! do |element|
       if element.is_a?(Array) && element.include?(unique_num)
         element = unique_num
+      else
+        element
       end
     end
+
+    end
   end
+
+binding.pry
 
   board
 
 end
 
 
+# CREATE hash with one key for each row (by index)
+# ITERATE through board (rows)
+#  ITERATE through rows (cells)
+#   add possible numbers to value in hash for that row (access by index)
+#   ITERATE through hash
+#    REFINE all possibilities into one unique number if possible.
+#    num_times.select {|key,value| value == 1}.keys[0]
+# END
+# ITERATAE through board (rows)
+#  ITERATE through rows(cell)
+#    IF cell is an array and the array includes the value of the row's key in the hash of unique values
+#      REPLACE with unique value from hash
+#    ELSE
+#      keep same element
+#   END
 
 
