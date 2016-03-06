@@ -7,36 +7,34 @@ def solve(board_string, not_simplified=0)
     board = board_string
   end
 
-  pretty_board(board)
+  #pretty_board(board) #print board every time
 
-  if solved?(board) || not_simplified == 500
+  if solved?(board) || not_simplified == 81
     pretty_board(board)
   else
     simplify(board, not_simplified)
   end
-  # binding.pry
 end
 
 def make_board(board_string)
   board_string.scan(/.{9}/).map! do |x|
-    x.split('').map do |y|
-       y == '-' ? ' ' : y.to_i
-    end
+    x.split('').map {|y| y == '-' ? ' ' : y.to_i}
   end
 end
 
 def simplify(board, not_simplified=0)
   board = unique_possibilities_check(box_check(vertical_check(horizontal_check(board))))
   num_simplified = 0
-  #binding.pry
+
   board.each do |row|
     row.map! do |cell|
       if cell.is_a?(Array) && cell.length == 1
         num_simplified += 1
-        cell = cell[0]
+        cell[0]
       elsif cell.is_a?(Array) && cell.length > 1
         cell = ' '
-      else cell = cell
+      else
+        cell
       end
     end
   end
@@ -44,38 +42,25 @@ def simplify(board, not_simplified=0)
   if num_simplified == 0
     not_simplified += 1
   end
-# binding.pry
+
   solve(board, not_simplified)
 end
 
 def solved?(board)
 	board.each do |row|
 		row.each do |cell|
-			if !cell.is_a?(Integer)
-				return false
-			end
+			return false if !cell.is_a?(Integer)
 		end
 	end
-	return true
+	true
 end
 
 def horizontal_check(board)
 	board.each do |row|
-		check_arr = [1,2,3,4,5,6,7,8,9]
-		row.find_all do |cell|
-			if cell.is_a?(Integer)
-				check_arr.delete(cell)
-			end
-		end
-		row.map! do |cell|
-			if !cell.is_a?(Integer)
-				cell = check_arr
-			else
-				cell = cell
-			end
-		end
+		check_arr = (1..9).to_a
+		row.find_all {|cell| check_arr.delete(cell) if cell.is_a?(Integer)}
+		row.map! {|cell| !cell.is_a?(Integer) ? check_arr : cell}
 	end
-# binding.pry
 	board
 end
 
@@ -83,18 +68,9 @@ def vertical_check(board)
   transposed_board = board.transpose
   transposed_board.each do |column|
     removal_arr = column.select { |cell| cell.is_a?(Integer) }
-    column.map! do |cell|
-      if cell.is_a?(Array)
-        cell = cell - removal_arr
-      else
-        cell = cell
-      end
-    end
+    column.map! {|cell| cell.is_a?(Array) ? cell -= removal_arr : cell}
   end
-  board = transposed_board.transpose
-  # binding.pry
-  board
-
+  transposed_board.transpose
 end
 
 def box_check(board)
@@ -110,24 +86,15 @@ def box_check(board)
     "bottom_right" => [[6,7,8],[6,7,8]],
   }
 
-  existing_nums_per_box = {
-    "top_left" => [],
-    "top_middle" => [],
-    "top_right" => [],
-    "middle_left" => [],
-    "middle" => [],
-    "middle_right" => [],
-    "bottom_left" => [],
-    "bottom_middle" => [],
-    "bottom_right" => [],
-  }
+  existing_nums_per_box = row_column_coordinates.keys.inject({})do |hash,key|
+    hash[key] = []
+    hash
+  end
 
   row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
-          if board[row_num][col_num].is_a?(Integer)
-            existing_nums_per_box[name] << board[row_num][col_num]
-          end
+          existing_nums_per_box[name] << board[row_num][col_num] if board[row_num][col_num].is_a?(Integer)
         end
     end
   end
@@ -135,14 +102,10 @@ def box_check(board)
   row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
-          # binding.pry
-          if board[row_num][col_num].is_a?(Array)
-            board[row_num][col_num] -= existing_nums_per_box[name]
-          end
+           board[row_num][col_num] -= existing_nums_per_box[name] if board[row_num][col_num].is_a?(Array)
         end
     end
   end
-  #binding.pry
   board
 end
 
@@ -153,89 +116,55 @@ end
 
 
 def unique_possibilities_check(board)
-  uniques = {
-    0 => nil,
-    1 => nil,
-    2 => nil,
-    3 => nil,
-    4 => nil,
-    5 => nil,
-    6 => nil,
-    7 => nil,
-    8 => nil
-  }
+
+  uniques = (0..8).to_a.inject({}) do |hash, keys|
+    hash[keys] = nil
+    hash
+  end
+
   board.each_with_index do |row, index|
     arrays = []
-    num_times = Hash.new
-
+    num_times = (1..9).to_a.inject({}) do |hash, keys|
+      hash[keys] = 0
+      hash
+    end
     arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
-    	if arrays != nil
-      	arrays.each do |number|
-        	if num_times.keys.include?(number)
-          	num_times[number] += 1
-        	else
-          	num_times[number] = 1
-        	end
-      	end
-      uniques[index] = num_times.select {|key,value| value == 1}.keys
-     	end
+    arrays.each {|number| num_times[number] += 1} if arrays != nil
+    uniques[index] = num_times.select {|key,value| value == 1}.keys
   end
+
 
   board.each_with_index do |row, index|
     row.map! do |cell|
-      if cell.is_a?(Array) && cell.include?(uniques[index][0])
-        cell = uniques[index]
-      else
-        cell
-      end
+      cell.is_a?(Array) && cell.include?(uniques[index][0]) ? uniques[index] : cell
     end
   end
+
 
   board.transpose.each_with_index do |row, index|
    	arrays = []
-    num_times = Hash.new
-		arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
-    if arrays != nil
-      arrays.each do |number|
-        if num_times.keys.include?(number)
-          num_times[number] += 1
-        else
-          num_times[number] = 1
-        end
-      end
-      uniques[index] = num_times.select {|key,value| value == 1}.keys
+    num_times = (1..9).to_a.inject({}) do |hash, keys|
+      hash[keys] = 0
+      hash
     end
+		arrays = row.select{|cell| cell.is_a?(Array) && cell.length > 0}.flatten!
+    arrays.each {|number| num_times[number] += 1} if arrays != nil
+    uniques[index] = num_times.select {|key,value| value == 1}.keys
   end
 
   board.transpose.each_with_index do |row, index|
     row.map! do |cell|
-      if cell.is_a?(Array) && cell.include?(uniques[index][0])
-        cell = uniques[index]
-      else
-        cell
-      end
+      cell.is_a?(Array) && cell.include?(uniques[index][0]) ? uniques[index] : cell
     end
   end
 
-	board = box_unique(board)
- #binding.pry
-	board
+	box_unique(board)
+
 
 end
 
 def box_unique(board)
 
-  box_unique = {
-    "top_left" => [],
-    "top_middle" => [],
-    "top_right" => [],
-    "middle_left" => [],
-    "middle" => [],
-    "middle_right" => [],
-    "bottom_left" => [],
-    "bottom_middle" => [],
-    "bottom_right" => [],
-  }
 
 row_column_coordinates = {
     "top_left" => [[0,1,2],[0,1,2]],
@@ -248,6 +177,11 @@ row_column_coordinates = {
     "bottom_middle" => [[6,7,8],[3,4,5]],
     "bottom_right" => [[6,7,8],[6,7,8]],
   }
+
+  box_unique = row_column_coordinates.keys.inject({})do |hash,key|
+    hash[key] = []
+    hash
+  end
 
  row_column_coordinates.each do |name, coordinates|
   board.slice(coordinates[0].first, 3).each do |row|
