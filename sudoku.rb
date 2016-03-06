@@ -157,16 +157,11 @@ def unique_possibilities_check(board)
       cell.is_a?(Array) && cell.include?(uniques[index][0]) ? uniques[index] : cell
     end
   end
-
 	box_unique(board)
-
-
 end
 
 def box_unique(board)
-
-
-row_column_coordinates = {
+  row_column_coordinates = {
     "top_left" => [[0,1,2],[0,1,2]],
     "top_middle" => [[0,1,2],[3,4,5]],
     "top_right" => [[0,1,2],[6,7,8]],
@@ -188,23 +183,16 @@ row_column_coordinates = {
       row = row.slice(coordinates[1].first, 3)
       row.select!{|element| element.is_a?(Array)}
       box_unique[name] << row
-
     end
     box_unique[name].flatten!
-    #binding.pry
  end
 
  box_unique.each do |name, possibilities|
   num_times = Hash.new
   possibilities.each do |number|
-    if num_times.keys.include?(number)
-      num_times[number] += 1
-    else
-      num_times[number] = 1
-    end
+    num_times.keys.include?(number) ? num_times[number] += 1 : num_times[number] = 1
   end
   box_unique[name] = num_times.select{|key,value| value == 1}.keys
-   #binding.pry
 end
 
 row_column_coordinates.each do |name, coordinates|
