@@ -177,13 +177,13 @@ def unique_possibilities_check(board)
           	num_times[number] = 1
         	end
       	end
-      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
+      uniques[index] = num_times.select {|key,value| value == 1}.keys
      	end
   end
 
   board.each_with_index do |row, index|
     row.map! do |cell|
-      if cell.is_a?(Array) && cell.include?(uniques[index])
+      if cell.is_a?(Array) && cell.include?(uniques[index][0])
         cell = uniques[index]
       else
         cell
@@ -203,13 +203,13 @@ def unique_possibilities_check(board)
           num_times[number] = 1
         end
       end
-      uniques[index] = num_times.select {|key,value| value == 1}.keys[0]
+      uniques[index] = num_times.select {|key,value| value == 1}.keys
     end
   end
 
   board.transpose.each_with_index do |row, index|
     row.map! do |cell|
-      if cell.is_a?(Array) && cell.include?(uniques[index])
+      if cell.is_a?(Array) && cell.include?(uniques[index][0])
         cell = uniques[index]
       else
         cell
@@ -269,7 +269,7 @@ row_column_coordinates = {
       num_times[number] = 1
     end
   end
-  box_unique[name] = num_times.select{|key,value| value == 1}.keys[0]
+  box_unique[name] = num_times.select{|key,value| value == 1}.keys
    #binding.pry
 end
 
@@ -277,7 +277,7 @@ row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
 
-          if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].include?(box_unique[name])
+          if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].include?(box_unique[name][0])
             board[row_num][col_num] = box_unique[name]
           end
         end
