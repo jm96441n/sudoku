@@ -142,7 +142,7 @@ def box_check(board)
         end
     end
   end
-# binding.pry
+  #binding.pry
   board
 end
 
@@ -217,116 +217,27 @@ def unique_possibilities_check(board)
     end
   end
 
-	box_unique(board)
+	board = box_unique(board)
  #binding.pry
 	board
 
 end
 
 def box_unique(board)
-  uniques = {
-    0 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    1 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    2 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    3 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    4 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    5 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    6 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    7 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	},
-    8 => {
-		    	0 => nil,
-			    1 => nil,
-			    2 => nil,
-			    3 => nil,
-			    4 => nil,
-			    5 => nil,
-			    6 => nil,
-			    7 => nil,
-			    8 => nil
-		    	}
+
+  box_unique = {
+    "top_left" => [],
+    "top_middle" => [],
+    "top_right" => [],
+    "middle_left" => [],
+    "middle" => [],
+    "middle_right" => [],
+    "bottom_left" => [],
+    "bottom_middle" => [],
+    "bottom_right" => [],
   }
 
-	row_column_coordinates = {
+row_column_coordinates = {
     "top_left" => [[0,1,2],[0,1,2]],
     "top_middle" => [[0,1,2],[3,4,5]],
     "top_right" => [[0,1,2],[6,7,8]],
@@ -338,70 +249,51 @@ def box_unique(board)
     "bottom_right" => [[6,7,8],[6,7,8]],
   }
 
-	row_column_coordinates.each do |name, coordinates|
-		num_times = Hash.new
-		arrays = []
-	  coordinates[0].each do |row_num|
-	    coordinates[1].each do |col_num|
-					if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].length > 0
-	         arrays.push(board[row_num][col_num]).flatten!
-	       	end
-		    	if arrays != nil
-		    	arrays.each do |number|
-		      	if num_times.keys.include?(number)
-		       		num_times[number] += 1
-	       		else
-		     			num_times[number] = 1
-		   			end
-	  			end
-		  			# binding.pry
-		  	end
-		  end
-		end
-	
-	row_column_coordinates.each do |name, coordinates|
-	  coordinates[0].each do |row_num|
-  	  coordinates[1].each do |col_num|
-  	  	uniques[row_num][col_num] = num_times.select {|key,value| value == 1}.keys[0]
-  	 		binding.pry
-  	  end
-  	end
+ row_column_coordinates.each do |name, coordinates|
+  board.slice(coordinates[0].first, 3).each do |row|
+      row = row.slice(coordinates[1].first, 3)
+      row.select!{|element| element.is_a?(Array)}
+      box_unique[name] << row
+
+    end
+    box_unique[name].flatten!
+    #binding.pry
+ end
+
+ box_unique.each do |name, possibilities|
+  num_times = Hash.new
+  possibilities.each do |number|
+    if num_times.keys.include?(number)
+      num_times[number] += 1
+    else
+      num_times[number] = 1
+    end
   end
-	row_column_coordinates.each do |name, coordinates|
-	  coordinates[0].each do |row_num|
-  	  coordinates[1].each do |col_num|
-	        # board[row_num][col_num].map! do |num|
-	        	if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].include?(uniques[row_num][col_num])
-	        	 	board[row_num][col_num] = uniques[row_num][col_num]
-	      		else
-	        		board[row_num][col_num]
-	        	end
-	      	#end
-	      	#binding.pry
-	    	end
-			end
-		end
-	end
-	board
+  box_unique[name] = num_times.select{|key,value| value == 1}.keys[0]
+   #binding.pry
+end
+
+row_column_coordinates.each do |name, coordinates|
+    coordinates[0].each do |row_num|
+        coordinates[1].each do |col_num|
+
+          if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].include?(box_unique[name])
+            board[row_num][col_num] = box_unique[name]
+          end
+        end
+         # binding.pry
+    end
+  end
+  #binding.pry
+  board
 end
 
 
 
-#box unique check
-# hash coordinates
-#  access each coordinate in box
-#   if array push into array, flatten and find unique num
-# access each coordinate
-#   if array includes unique number replace array for unique num
 
-#box_check may have to be split into separate methods to make the array, make the counter hash
-# and to find the unique numbers
 
-# next logic
-# after 81 tries (tracked through passed variable)
-# call test method
-#  save current board as a variable
-#  try each possibility in each box with an array
-#  if 81 tries do not produce solution, move to next box or next possibility in box
-#  if box solved? return board to original method solve?
+
+# row[coordinates[1].first..coordinates[1].last]
+
+
 
