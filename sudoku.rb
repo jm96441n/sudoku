@@ -7,7 +7,7 @@ def solve(board_string, not_simplified=0)
     board = board_string
   end
 
-  #pretty_board(board) #print board every time
+  pretty_board(board) #print board every time
 
   if solved?(board) || not_simplified == 81
     pretty_board(board)
@@ -198,24 +198,11 @@ end
 row_column_coordinates.each do |name, coordinates|
     coordinates[0].each do |row_num|
         coordinates[1].each do |col_num|
-
           if board[row_num][col_num].is_a?(Array) && board[row_num][col_num].include?(box_unique[name][0])
             board[row_num][col_num] = box_unique[name]
           end
         end
-         # binding.pry
     end
   end
-  #binding.pry
   board
 end
-
-
-
-
-
-
-# row[coordinates[1].first..coordinates[1].last]
-
-
-
